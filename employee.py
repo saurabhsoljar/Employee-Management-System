@@ -77,7 +77,11 @@ class Employee:
         lbl_dep.grid(row=0, column=0, padx=2, sticky=W)
 
         combo_dep = ttk.Combobox(
-            upper_frame, font=("arial", 12, "bold"), width=17, state="readonly"
+            upper_frame,
+            font=("arial", 12, "bold"),
+            width=17,
+            state="readonly",
+            cursor="hand2",
         )
         combo_dep["value"] = (
             "Select Department",
@@ -138,7 +142,11 @@ class Employee:
         lbl_merried_status.grid(row=2, column=2, sticky=W, padx=2, pady=7)
 
         com_txt_merried = ttk.Combobox(
-            upper_frame, state="readonly", width=20, font=("arial", 11, "bold")
+            upper_frame,
+            state="readonly",
+            width=20,
+            font=("arial", 11, "bold"),
+            cursor="hand2",
         )
         com_txt_merried["value"] = ("Merried", "Unmarried")
         com_txt_merried.current(0)
@@ -164,7 +172,11 @@ class Employee:
 
         # Id Proof
         com_txt_proof = ttk.Combobox(
-            upper_frame, state="readonly", font=("arial", 12, "bold"), width=22
+            upper_frame,
+            state="readonly",
+            font=("arial", 12, "bold"),
+            width=22,
+            cursor="hand2",
         )
         com_txt_proof["values"] = (
             "Select ID Proof",
@@ -186,7 +198,11 @@ class Employee:
         lbl_gender.grid(row=4, column=2, sticky=W, padx=2, pady=7)
 
         com_txt_gender = ttk.Combobox(
-            upper_frame, state="readonly", font=("arial", 12, "bold"), width=18
+            upper_frame,
+            state="readonly",
+            font=("arial", 12, "bold"),
+            width=18,
+            cursor="hand2",
         )
 
         com_txt_gender["values"] = ("Male", "Female", "Other")
@@ -241,6 +257,7 @@ class Employee:
             width=13,
             bg="blue",
             fg="white",
+            cursor="hand2",
         )
         btn_add.grid(row=0, column=0, padx=1, pady=5)
 
@@ -251,6 +268,7 @@ class Employee:
             width=13,
             bg="blue",
             fg="white",
+            cursor="hand2",
         )
         btn_update.grid(row=1, column=0, padx=1, pady=5)
 
@@ -261,6 +279,7 @@ class Employee:
             width=13,
             bg="blue",
             fg="white",
+            cursor="hand2",
         )
         btn_delete.grid(row=2, column=0, padx=1, pady=5)
 
@@ -271,6 +290,7 @@ class Employee:
             width=13,
             bg="blue",
             fg="white",
+            cursor="hand2",
         )
         btn_clear.grid(row=3, column=0, padx=1, pady=5)
 
@@ -284,6 +304,133 @@ class Employee:
             fg="red",
         )
         down_frame.place(x=10, y=280, width=1480, height=270)
+
+        # Search Frame
+        search_frame = LabelFrame(
+            down_frame,
+            relief=RIDGE,
+            bg="white",
+            text="Search Employee Information",
+            font=("times new roman", 11, "bold"),
+            fg="red",
+        )
+        search_frame.place(x=0, y=0, width=1470, height=60)
+
+        search_by = Label(
+            search_frame,
+            relief=RIDGE,
+            bg="white",
+            text="Search By:",
+            font=("times new roman", 11, "bold"),
+            fg="red",
+        )
+        search_by.grid(row=0, column=0, sticky=W, padx=5)
+
+        # search
+        com_txt_search = ttk.Combobox(
+            search_frame,
+            state="readonly",
+            font=("arial", 12, "bold"),
+            width=18,
+            cursor="hand2",
+        )
+        com_txt_search["values"] = ("Select Option", "Phone", "id_proof")
+        com_txt_search.current(0)
+        com_txt_search.grid(row=0, column=1, sticky=W, padx=5)
+
+        txt_search = ttk.Entry(search_frame, width=22, font=("arial", 11, "bold"))
+        txt_search.grid(row=0, column=2, padx=5)
+
+        btn_search = Button(
+            search_frame, text="Search", font=("arial", 11, "bold"), width=14, bg="blue"
+        )
+        btn_search.grid(row=0, column=3, padx=5)
+
+        btn_ShowAll = Button(
+            search_frame,
+            text="Show All",
+            font=("arial", 11, "bold"),
+            width=14,
+            bg="blue",
+        )
+        btn_ShowAll.grid(row=0, column=4, padx=5)
+
+        stayhome = Label(
+            search_frame,
+            text="Protect Yourself, Protect Others",
+            font=("times new roman", 30, "bold"),
+            fg="red",
+        )
+        stayhome.place(x=780, y=0, width=600, height=30)
+
+        # ========================== Employee Table =========================
+        # Table Frame
+        table_frame = Frame(down_frame, bd=3, relief=RIDGE)
+        table_frame.place(x=0, y=60, width=1470, height=170)
+
+        scroll_x = ttk.Scrollbar(table_frame, orient=HORIZONTAL)
+        scroll_y = ttk.Scrollbar(table_frame, orient=VERTICAL)
+
+        self.employee_table = ttk.Treeview(
+            table_frame,
+            columns=(
+                "dep",
+                "name",
+                "email",
+                "address",
+                "married",
+                "dob",
+                "doj",
+                "idProofcom",
+                "idProof",
+                "gender",
+                "phone",
+                "country",
+                "salary",
+            ),
+            xscrollcommand=scroll_x.set,
+            yscrollcommand=scroll_y.set,
+        )
+
+        # Configure Column Headers
+        self.employee_table.heading("dep", text="Department")
+        self.employee_table.heading("name", text="Name")
+        self.employee_table.heading("email", text="Email")
+        self.employee_table.heading("address", text="Address")
+        self.employee_table.heading("married", text="Married")
+        self.employee_table.heading("dob", text="DOB")
+        self.employee_table.heading("doj", text="DOJ")
+        self.employee_table.heading("idProofcom", text="ID Proof Type")
+        self.employee_table.heading("idProof", text="ID Proof")
+        self.employee_table.heading("gender", text="Gender")
+        self.employee_table.heading("phone", text="Phone")
+        self.employee_table.heading("country", text="Country")
+        self.employee_table.heading("salary", text="Salary")
+
+        # Configure Column Widths
+        self.employee_table.column("#0", width=0, stretch=NO)
+        for col in self.employee_table["columns"]:
+            self.employee_table.column(col, anchor=W, width=100)
+
+        # Alternate Row Colors
+        style = ttk.Style()
+        style.configure("Treeview.Heading", font=("arial", 10, "bold"))
+        style.configure("Treeview", rowheight=25)
+        style.configure(
+            "Treeview",
+            background="#D3D3D3",
+            foreground="black",
+            fieldbackground="#D3D3D3",
+        )
+        style.map("Treeview", background=[("alternate", "#E8E8E8")])
+
+        self.employee_table.pack(fill=BOTH, expand=1)
+
+        scroll_x.pack(side=BOTTOM, fill=X)
+        scroll_y.pack(side=RIGHT, fill=Y)
+
+        scroll_x.config(command=self.employee_table.xview)
+        scroll_y.config(command=self.employee_table.yview)
 
 
 if __name__ == "__main__":
