@@ -1,6 +1,9 @@
 from tkinter import *
 from tkinter import ttk
 from PIL import Image, ImageTk
+from tkinter import messagebox
+import mysql.connector
+from mysql.connector import Error
 
 
 class Employee:
@@ -8,6 +11,23 @@ class Employee:
         self.root = root
         self.root.geometry("1530x790+0+0")
         self.root.title("Employee Management System")
+
+        # Variables
+
+        self.var_dep = StringVar()
+        self.var_name = StringVar()
+        self.var_designition = StringVar()
+        self.var_email = StringVar()
+        self.var_address = StringVar()
+        self.var_married = StringVar()
+        self.var_dob = StringVar()
+        self.var_doj = StringVar()
+        self.var_idproofcomb = StringVar()
+        self.var_idproof = StringVar()
+        self.var_gender = StringVar()
+        self.var_phone = StringVar()
+        self.var_country = StringVar()
+        self.var_salary = StringVar()
 
         lbl_title = Label(
             self.root,
@@ -78,6 +98,7 @@ class Employee:
 
         combo_dep = ttk.Combobox(
             upper_frame,
+            textvariable=self.var_dep,
             font=("arial", 12, "bold"),
             width=17,
             state="readonly",
@@ -105,7 +126,12 @@ class Employee:
         )
         lbl_name.grid(row=0, column=2, sticky=W, padx=2, pady=7)
 
-        txt_name = ttk.Entry(upper_frame, width=22, font=("arial", 11, "bold"))
+        txt_name = ttk.Entry(
+            upper_frame,
+            textvariable=self.var_name,
+            width=22,
+            font=("arial", 11, "bold"),
+        )
         txt_name.grid(row=0, column=3, padx=2, pady=7)
 
         # lbl_Designition
@@ -114,7 +140,12 @@ class Employee:
         )
         lbl_Designition.grid(row=1, column=0, sticky=W, padx=2, pady=7)
 
-        txt_Designition = ttk.Entry(upper_frame, width=22, font=("arial", 11, "bold"))
+        txt_Designition = ttk.Entry(
+            upper_frame,
+            textvariable=self.var_designition,
+            width=22,
+            font=("arial", 11, "bold"),
+        )
         txt_Designition.grid(row=1, column=1, sticky=W, padx=2, pady=7)
 
         # Email
@@ -123,7 +154,12 @@ class Employee:
         )
         lbl_email.grid(row=1, column=2, sticky=W, padx=2, pady=2)
 
-        txt_email = ttk.Entry(upper_frame, width=22, font=("arial", 11, "bold"))
+        txt_email = ttk.Entry(
+            upper_frame,
+            textvariable=self.var_email,
+            width=22,
+            font=("arial", 11, "bold"),
+        )
         txt_email.grid(row=1, column=3, padx=2, pady=7)
 
         # Address
@@ -132,7 +168,12 @@ class Employee:
         )
         lbl_adderss.grid(row=2, column=0, sticky=W, padx=2, pady=7)
 
-        txt_adderss = ttk.Entry(upper_frame, width=22, font=("arial", 11, "bold"))
+        txt_adderss = ttk.Entry(
+            upper_frame,
+            textvariable=self.var_address,
+            width=22,
+            font=("arial", 11, "bold"),
+        )
         txt_adderss.grid(row=2, column=1, padx=2, pady=7)
 
         # married
@@ -143,12 +184,16 @@ class Employee:
 
         com_txt_merried = ttk.Combobox(
             upper_frame,
+            textvariable=self.var_married,
             state="readonly",
             width=20,
             font=("arial", 11, "bold"),
             cursor="hand2",
         )
-        com_txt_merried["value"] = ("Merried", "Unmarried")
+        com_txt_merried["value"] = (
+            "Unmarried",
+            "Merried",
+        )
         com_txt_merried.current(0)
         com_txt_merried.grid(row=2, column=3, sticky=W, padx=2, pady=7)
 
@@ -158,7 +203,9 @@ class Employee:
         )
         lbl_dob.grid(row=3, column=0, sticky=W, padx=2, pady=7)
 
-        txt_dob = ttk.Entry(upper_frame, width=22, font=("arial", 11, "bold"))
+        txt_dob = ttk.Entry(
+            upper_frame, textvariable=self.var_dob, width=22, font=("arial", 11, "bold")
+        )
         txt_dob.grid(row=3, column=1, padx=2, pady=7)
 
         # Doj
@@ -167,12 +214,15 @@ class Employee:
         )
         lbl_doj.grid(row=3, column=2, sticky=W, padx=2, pady=7)
 
-        txt_doj = ttk.Entry(upper_frame, width=22, font=("arial", 11, "bold"))
+        txt_doj = ttk.Entry(
+            upper_frame, textvariable=self.var_doj, width=22, font=("arial", 11, "bold")
+        )
         txt_doj.grid(row=3, column=3, padx=2, pady=7)
 
-        # Id Proof
+        # Id Proof Type select
         com_txt_proof = ttk.Combobox(
             upper_frame,
+            textvariable=self.var_idproofcomb,
             state="readonly",
             font=("arial", 12, "bold"),
             width=22,
@@ -187,8 +237,13 @@ class Employee:
         )
         com_txt_proof.current(0)
         com_txt_proof.grid(row=4, column=0, sticky=W, padx=2, pady=7)
-
-        txt_proof = ttk.Entry(upper_frame, width=22, font=("arial", 11, "bold"))
+        # enter number Type
+        txt_proof = ttk.Entry(
+            upper_frame,
+            textvariable=self.var_idproof,
+            width=22,
+            font=("arial", 11, "bold"),
+        )
         txt_proof.grid(row=4, column=1, padx=2, pady=7)
 
         # gender
@@ -199,6 +254,7 @@ class Employee:
 
         com_txt_gender = ttk.Combobox(
             upper_frame,
+            textvariable=self.var_gender,
             state="readonly",
             font=("arial", 12, "bold"),
             width=18,
@@ -215,7 +271,12 @@ class Employee:
         )
         lbl_phone.grid(row=0, column=4, sticky=W, padx=2, pady=7)
 
-        txt_phone = ttk.Entry(upper_frame, width=22, font=("arial", 11, "bold"))
+        txt_phone = ttk.Entry(
+            upper_frame,
+            textvariable=self.var_phone,
+            width=22,
+            font=("arial", 11, "bold"),
+        )
         txt_phone.grid(row=0, column=5, padx=2, pady=7)
 
         # country
@@ -224,7 +285,12 @@ class Employee:
         )
         lbl_country.grid(row=1, column=4, sticky=W, padx=2, pady=7)
 
-        txt_country = ttk.Entry(upper_frame, width=22, font=("arial", 11, "bold"))
+        txt_country = ttk.Entry(
+            upper_frame,
+            textvariable=self.var_country,
+            width=22,
+            font=("arial", 11, "bold"),
+        )
         txt_country.grid(row=1, column=5, padx=2, pady=7)
 
         # CTC
@@ -233,7 +299,12 @@ class Employee:
         )
         lbl_ctc.grid(row=2, column=4, sticky=W, padx=2, pady=7)
 
-        txt_ctc = ttk.Entry(upper_frame, width=22, font=("arial", 11, "bold"))
+        txt_ctc = ttk.Entry(
+            upper_frame,
+            textvariable=self.var_salary,
+            width=22,
+            font=("arial", 11, "bold"),
+        )
         txt_ctc.grid(row=2, column=5, padx=2, pady=7)
 
         # Profile img
@@ -252,6 +323,7 @@ class Employee:
 
         btn_add = Button(
             button_frame,
+            command=self.add_data,
             text="Save",
             font=("arial", 15, "bold"),
             width=13,
@@ -376,6 +448,7 @@ class Employee:
             columns=(
                 "dep",
                 "name",
+                "designition",
                 "email",
                 "address",
                 "married",
@@ -395,6 +468,7 @@ class Employee:
         # Configure Column Headers
         self.employee_table.heading("dep", text="Department")
         self.employee_table.heading("name", text="Name")
+        self.employee_table.heading("designition", text="designition")
         self.employee_table.heading("email", text="Email")
         self.employee_table.heading("address", text="Address")
         self.employee_table.heading("married", text="Married")
@@ -407,30 +481,116 @@ class Employee:
         self.employee_table.heading("country", text="Country")
         self.employee_table.heading("salary", text="Salary")
 
+        self.employee_table.pack(fill=BOTH, expand=1)
+        self.employee_table.bind("<ButtonRelease>", self.get_cursor)
+
+        self.fetch_data()
+
         # Configure Column Widths
         self.employee_table.column("#0", width=0, stretch=NO)
         for col in self.employee_table["columns"]:
             self.employee_table.column(col, anchor=W, width=100)
-
-        # Alternate Row Colors
-        style = ttk.Style()
-        style.configure("Treeview.Heading", font=("arial", 10, "bold"))
-        style.configure("Treeview", rowheight=25)
-        style.configure(
-            "Treeview",
-            background="#D3D3D3",
-            foreground="black",
-            fieldbackground="#D3D3D3",
-        )
-        style.map("Treeview", background=[("alternate", "#E8E8E8")])
-
-        self.employee_table.pack(fill=BOTH, expand=1)
 
         scroll_x.pack(side=BOTTOM, fill=X)
         scroll_y.pack(side=RIGHT, fill=Y)
 
         scroll_x.config(command=self.employee_table.xview)
         scroll_y.config(command=self.employee_table.yview)
+
+    # *************************Function Declaration******************
+
+    def add_data(self):
+        if self.var_dep.get() == "" or self.var_email.get() == "":
+            messagebox.showerror("Error", "All Fields are required")
+        else:
+            try:
+                conn = mysql.connector.connect(
+                    host="localhost",
+                    user="root",
+                    password="123456",
+                    database="employee",
+                )
+                my_cursor = conn.cursor()
+                my_cursor.execute(
+                    "insert into employees values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                    (
+                        self.var_dep.get(),
+                        self.var_name.get(),
+                        self.var_designition.get(),
+                        self.var_email.get(),
+                        self.var_address.get(),
+                        self.var_married.get(),
+                        self.var_dob.get(),
+                        self.var_doj.get(),
+                        self.var_idproofcomb.get(),
+                        self.var_idproof.get(),
+                        self.var_gender.get(),
+                        self.var_phone.get(),
+                        self.var_country.get(),
+                        self.var_salary.get(),
+                    ),
+                )
+                conn.commit()
+                self.fetch_data()
+                conn.close()
+                messagebox.showinfo(
+                    "success", "Employee has been add!", parent=self.root
+                )
+            except Exception as es:
+                messagebox.showerror("Error", f"Due to:{str(es)}", parent=self.root)
+
+    # Fetch data
+    def fetch_data(self):
+        conn = mysql.connector.connect(
+            host="localhost", user="root", password="123456", database="employee"
+        )
+        my_cursor = conn.cursor()
+        my_cursor.execute("select * from employees")
+        data = my_cursor.fetchall()
+        if len(data) != 0:
+            self.employee_table.delete(*self.employee_table.get_children())
+            for i in data:
+                self.employee_table.insert("", END, values=i)
+            conn.commit()
+        conn.close()
+
+    # Gte Cursor
+    def get_cursor(self, event=""):
+        cursor_row = self.employee_table.focus()
+        content = self.employee_table.item(cursor_row)
+        data = content["values"]
+
+        self.var_dep.set(data[0])
+        self.var_name.set(data[1])
+        self.var_designition.set(data[2])
+        self.var_email.set(data[3])
+        self.var_address.set(data[4])
+        self.var_married.set(data[5])
+        self.var_dob.set(data[6])
+        self.var_doj.set(data[7])
+        self.var_idproofcomb.set(data[8])
+        self.var_idproof.set(data[9])
+        self.var_gender.set(data[10])
+        self.var_phone.set(data[11])
+        self.var_country.set(data[12])
+        self.var_salary.set(data[13])
+        
+        
+    def update_data(self):
+        if self.var_dep.get() == "" or self.var_email.get() == "":
+            messagebox.showerror("Error", "All Fields are required")
+        else:
+            try:
+                update=messagebox.askyesno('Update','Are you update employee data')
+                if update>0:
+                    conn = mysql.connector.connect(
+                        host="localhost",
+                        user="root",
+                        password="123456",
+                        database="employee",
+                    )
+                    my_cursor = conn.cursor()
+                    my_cursor.execute('update employee Department=%s,Name=%s,Email=%s,Designition=%s,Address=%s,Married_status=%s,DOB=%s,DOJ=%s,id_proof_type=%s,gender=%s,Phone=%s,Country=%s,Salary=%s where id_proof=%s, ')
 
 
 if __name__ == "__main__":
