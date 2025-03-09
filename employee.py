@@ -4,6 +4,13 @@ from PIL import Image, ImageTk
 from tkinter import messagebox
 import mysql.connector
 from mysql.connector import Error
+import os
+from dotenv import load_dotenv
+from tkcalendar import DateEntry
+import re
+
+
+load_dotenv()
 
 
 class Employee:
@@ -203,10 +210,10 @@ class Employee:
         )
         lbl_dob.grid(row=3, column=0, sticky=W, padx=2, pady=7)
 
-        txt_dob = ttk.Entry(
-            upper_frame, textvariable=self.var_dob, width=22, font=("arial", 11, "bold")
+        self.dob_entry = DateEntry(
+            upper_frame, textvariable=self.var_dob, date_pattern="dd-mm-yyyy"
         )
-        txt_dob.grid(row=3, column=1, padx=2, pady=7)
+        self.dob_entry.grid(row=3, column=1, padx=2, pady=7)
 
         # Doj
         lbl_doj = Label(
@@ -214,10 +221,10 @@ class Employee:
         )
         lbl_doj.grid(row=3, column=2, sticky=W, padx=2, pady=7)
 
-        txt_doj = ttk.Entry(
-            upper_frame, textvariable=self.var_doj, width=22, font=("arial", 11, "bold")
+        self.doj_entry = DateEntry(
+            upper_frame, textvariable=self.var_doj, date_pattern="dd-mm-yyyy"
         )
-        txt_doj.grid(row=3, column=3, padx=2, pady=7)
+        self.doj_entry.grid(row=3, column=3, padx=2, pady=7)
 
         # Id Proof Type select
         com_txt_proof = ttk.Combobox(
@@ -308,7 +315,7 @@ class Employee:
         txt_ctc.grid(row=2, column=5, padx=2, pady=7)
 
         # Profile img
-        img_mask = Image.open("images/saurabh.jpg")
+        img_mask = Image.open("images/SA.PNG")
         img_mask = img_mask.resize((200, 220), Image.LANCZOS)
         self.photomask = ImageTk.PhotoImage(img_mask)
 
@@ -336,6 +343,7 @@ class Employee:
         btn_update = Button(
             button_frame,
             text="Update",
+            command=self.update_data,
             font=("arial", 15, "bold"),
             width=13,
             bg="blue",
@@ -346,6 +354,7 @@ class Employee:
 
         btn_delete = Button(
             button_frame,
+            command=self.delete_data,
             text="Delete",
             font=("arial", 15, "bold"),
             width=13,
@@ -357,6 +366,7 @@ class Employee:
 
         btn_clear = Button(
             button_frame,
+            command=self.reset_data,
             text="Clear",
             font=("arial", 15, "bold"),
             width=13,
@@ -399,8 +409,10 @@ class Employee:
         search_by.grid(row=0, column=0, sticky=W, padx=5)
 
         # search
+        self.var_com_search = StringVar()
         com_txt_search = ttk.Combobox(
             search_frame,
+            textvariable=self.var_com_search,
             state="readonly",
             font=("arial", 12, "bold"),
             width=18,
@@ -410,16 +422,28 @@ class Employee:
         com_txt_search.current(0)
         com_txt_search.grid(row=0, column=1, sticky=W, padx=5)
 
-        txt_search = ttk.Entry(search_frame, width=22, font=("arial", 11, "bold"))
+        self.var_search = StringVar()
+        txt_search = ttk.Entry(
+            search_frame,
+            textvariable=self.var_search,
+            width=22,
+            font=("arial", 11, "bold"),
+        )
         txt_search.grid(row=0, column=2, padx=5)
 
         btn_search = Button(
-            search_frame, text="Search", font=("arial", 11, "bold"), width=14, bg="blue"
+            search_frame,
+            command=self.search_data,
+            text="Search",
+            font=("arial", 11, "bold"),
+            width=14,
+            bg="blue",
         )
         btn_search.grid(row=0, column=3, padx=5)
 
         btn_ShowAll = Button(
             search_frame,
+            command=self.fetch_data,
             text="Show All",
             font=("arial", 11, "bold"),
             width=14,
@@ -497,6 +521,18 @@ class Employee:
         scroll_x.config(command=self.employee_table.xview)
         scroll_y.config(command=self.employee_table.yview)
 
+    def get_db_connection(self):
+        return mysql.connector.connect(
+            host="localhost",
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            database="employee",
+        )
+
+    def validate_email(self, email):
+        pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\[a-zA-Z0-9-.]+$"
+        return re.match(pattern, email) is not None
+
     # *************************Function Declaration******************
 
     def add_data(self):
@@ -504,12 +540,7 @@ class Employee:
             messagebox.showerror("Error", "All Fields are required")
         else:
             try:
-                conn = mysql.connector.connect(
-                    host="localhost",
-                    user="root",
-                    password="123456",
-                    database="employee",
-                )
+                conn = self.get_db_connection()
                 my_cursor = conn.cursor()
                 my_cursor.execute(
                     "insert into employees values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
@@ -541,9 +572,7 @@ class Employee:
 
     # Fetch data
     def fetch_data(self):
-        conn = mysql.connector.connect(
-            host="localhost", user="root", password="123456", database="employee"
-        )
+        conn = self.get_db_connection()
         my_cursor = conn.cursor()
         my_cursor.execute("select * from employees")
         data = my_cursor.fetchall()
@@ -574,23 +603,139 @@ class Employee:
         self.var_phone.set(data[11])
         self.var_country.set(data[12])
         self.var_salary.set(data[13])
-        
-        
+
+    # update_data
+
     def update_data(self):
         if self.var_dep.get() == "" or self.var_email.get() == "":
             messagebox.showerror("Error", "All Fields are required")
         else:
             try:
-                update=messagebox.askyesno('Update','Are you update employee data')
-                if update>0:
-                    conn = mysql.connector.connect(
-                        host="localhost",
-                        user="root",
-                        password="123456",
-                        database="employee",
-                    )
+                update = messagebox.askyesno("Update", "Are you update employee data")
+                if update > 0:
+                    conn = self.get_db_connection()
                     my_cursor = conn.cursor()
-                    my_cursor.execute('update employee Department=%s,Name=%s,Email=%s,Designition=%s,Address=%s,Married_status=%s,DOB=%s,DOJ=%s,id_proof_type=%s,gender=%s,Phone=%s,Country=%s,Salary=%s where id_proof=%s, ')
+                    my_cursor.execute(
+                        "update employees set Department=%s,Name=%s,Email=%s,Designition=%s,Address=%s,Married_status=%s,DOB=%s,DOJ=%s,id_proof_type=%s,gender=%s,Phone=%s,Country=%s,Salary=%s where id_proof=%s",
+                        (
+                            self.var_dep.get(),
+                            self.var_name.get(),
+                            self.var_designition.get(),
+                            self.var_email.get(),
+                            self.var_address.get(),
+                            self.var_married.get(),
+                            self.var_dob.get(),
+                            self.var_doj.get(),
+                            self.var_idproofcomb.get(),
+                            self.var_gender.get(),
+                            self.var_phone.get(),
+                            self.var_country.get(),
+                            self.var_salary.get(),
+                            self.var_idproof.get(),
+                        ),
+                    )
+                else:
+                    if not update:
+                        return
+                conn.commit()
+                self.fetch_data()
+                conn.close()
+                messagebox.showinfo(
+                    "success", "Employee SuccessFully Updated", parent=self.root
+                )
+            except Exception as es:
+                messagebox.showerror("Error", f"Due To:{str(es)}", parent=self.root)
+
+    # Delete data
+
+    def delete_data(self):
+        if self.var_idproof.get() == "":
+            messagebox.showerror("Error", "All fields are required", parent=self.root)
+        else:
+            try:
+                delete = messagebox.askyesno(
+                    "Delete", "Are you Sure delete this message", parent=self.root
+                )
+                if delete > 0:
+                    conn = self.get_db_connection()
+                    my_cursor = conn.cursor()
+                    sql = "delete from employees where id_proof=%s"
+                    value = (self.var_idproof.get(),)
+                    my_cursor.execute(sql, value)
+                else:
+                    if not delete:
+                        return
+                conn.commit()
+                self.fetch_data()
+                conn.close()
+                messagebox.showinfo(
+                    "delete", "Employee SuccessFully Delete", parent=self.root
+                )
+            except Exception as es:
+                messagebox.showerror("Error", f"Due To:{str(es)}", parent=self.root)
+
+    # Reset
+    def reset_data(self):
+        self.var_dep.set("")
+        self.var_name.set("Select Department")
+        self.var_designition.set("")
+        self.var_email.set("")
+        self.var_address.set("")
+        self.var_married.set("Married")
+        self.var_dob.set("")
+        self.var_doj.set("")
+        self.var_idproofcomb.set("Select ID Proof")
+        self.var_idproof.set("")
+        self.var_gender.set("Male")
+        self.var_phone.set("")
+        self.var_country.set("")
+        self.var_salary.set("")
+
+    # Search
+    def search_data(self):
+        if self.var_com_search.get() == "" or self.var_search.get() == "":
+            messagebox.showerror(
+                "Error",
+                "Please select a search option and enter a search term.",
+                parent=self.root,
+            )
+        else:
+            try:
+                conn = self.get_db_connection()
+                my_cursor = conn.cursor()
+
+                # Construct the SQL query with parameterized input
+                query = (
+                    "SELECT * FROM employees WHERE "
+                    + str(self.var_com_search.get())  # Column name
+                    + " LIKE %s"  # Use parameterized query for the value
+                )
+                value = (
+                    "%" + str(self.var_search.get()) + "%",
+                )  # Search value with wildcards
+
+                # Execute the query
+                my_cursor.execute(query, value)
+
+                # Fetch the results
+                rows = my_cursor.fetchall()
+
+                # Clear existing data in the table
+                self.employee_table.delete(*self.employee_table.get_children())
+
+                # Insert new data into the table
+                if len(rows) != 0:
+                    for row in rows:
+                        self.employee_table.insert("", END, values=row)
+                else:
+                    messagebox.showinfo(
+                        "Info", "No matching records found.", parent=self.root
+                    )
+
+                # Close the connection
+                conn.close()
+            except Exception as es:
+                messagebox.showerror("Error", f"Due To: {str(es)}", parent=self.root)
 
 
 if __name__ == "__main__":
