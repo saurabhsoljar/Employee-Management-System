@@ -6,6 +6,8 @@ The **Employee Management System** is a desktop application built using Python's
 
 This project is an excellent example of integrating a GUI with a database, making it suitable for interview discussions to demonstrate your skills in Python, Tkinter, MySQL, and software development.
 
+![image alt](https://github.com/saurabhsoljar/Employee-Management-System/blob/87e9e7571c24792e6ce328dff04ec6ff0a996bc7/emp.png)
+
 ---
 
 ## Features
